@@ -83,6 +83,14 @@
   <div id="answerBox" class="answer-box" style="display:none;"></div>
 </div>
 
+<div class="card">
+  <h2>৩. Agent-কে কাজ করতে বলো</h2>
+  <input id="agentInput" placeholder="যেমন: How many leaves does E102 have? Apply 1 day if any left.">
+  <button id="agentBtn" onclick="askAgent()">Agent-কে বলো</button>
+  <div class="status" id="agentStatus"></div>
+  <div id="agentAnswerBox" class="answer-box" style="display:none;"></div>
+</div>
+
 <div class="config">
   Backend URL: <input id="baseUrl" value="https://spring-ai-rag-demo.onrender.com">
   <br>(free tier ঘুমিয়ে থাকলে প্রথম request-এ ৩০-৫০ সেকেন্ড লাগতে পারে)
@@ -132,6 +140,31 @@ async function ask() {
 
   try {
     const url = `${getBaseUrl()}/api/rag/ask?question=${encodeURIComponent(question)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    const data = await res.json();
+    statusEl.textContent = '';
+    answerBox.textContent = data.answer;
+    answerBox.style.display = 'block';
+  } catch (err) {
+    statusEl.textContent = `❌ ভুল হয়েছে: ${err.message}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+async function askAgent() {
+  const question = document.getElementById('agentInput').value.trim();
+  const statusEl = document.getElementById('agentStatus');
+  const answerBox = document.getElementById('agentAnswerBox');
+  const btn = document.getElementById('agentBtn');
+  if (!question) { statusEl.textContent = '⚠️ একটা প্রশ্ন/নির্দেশ লেখো।'; return; }
+
+  btn.disabled = true;
+  statusEl.textContent = '⏳ Agent কাজ করছে...';
+  answerBox.style.display = 'none';
+
+  try {
+    const url = `${getBaseUrl()}/api/agent/ask?question=${encodeURIComponent(question)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Server error: ${res.status}`);
     const data = await res.json();
