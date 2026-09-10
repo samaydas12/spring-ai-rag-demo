@@ -52,11 +52,11 @@ public class RagService {
     public String ask(String question) {
         // Retrieval: similarity search against the vector store
         List<Document> relevantDocs = vectorStore.similaritySearch(
-                SearchRequest.query(question).withTopK(4)
+                SearchRequest.builder().query(question).topK(4).build()
         );
 
         String context = relevantDocs.stream()
-                .map(Document::getContent)
+                .map(Document::getText)
                 .collect(Collectors.joining("\n---\n"));
 
         // Generation: pass retrieved context + question to Claude
