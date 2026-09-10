@@ -10,6 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rag")
+@CrossOrigin(origins = "*")
 public class RagController {
 
     private final RagService ragService;
